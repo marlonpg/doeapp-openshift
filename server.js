@@ -81,6 +81,11 @@ app.get("/logout", function(req, res) {
   res.send("You have been logged out of the system!");
 });
 
+app.get('/pagecount', function (req, res) {
+//openshift test
+	res.send('{ pageCount: 0}');
+  });
+
 ///////////////////
 //API ROUTES
 var routes = express.Router(); 
