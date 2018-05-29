@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('doeApp')
-	.constant("baseURL","http://localhost:8080/")
+	.constant("baseURL","/")
 	.factory('UserService', function() {
 	  return {
 		  token : '',
