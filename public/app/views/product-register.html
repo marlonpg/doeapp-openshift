@@ -1,0 +1,71 @@
+<div class="container" ng-controller="ProductRegisterController"> 
+	<div class="row">
+		<div class="col-xs-12">
+			<nav class="breadcrumb">
+				<a class="breadcrumb-item" href="#">Página Inicial</a>
+				<span class="breadcrumb-item active">Cadastro de produtos</span>
+			</nav>
+		</div>
+		<div class="col-xs-12">
+		   <h3>Cadastre um novo produto para doação.</h3>
+		   <hr>
+		</div>
+	</div> 
+    <form class="col-md-9" id='prodregister'action = "/product" method = "POST" enctype = "multipart/form-data">
+        <div class="form-group col-md-12">
+        <h2>Informações do Produto</h2>
+        </div>
+        <div class="form-group col-md-12">
+            <input type="text" class="form-control" name="productName" id="productName" placeholder="Nome do produto">
+        </div>
+        <div class="form-group col-md-12">
+            <textarea class="form-control" rows="4" cols="50" name="productDescription" id="productDescription" placeholder="Descrição do produto" form="prodregister"></textarea>
+        </div>
+
+        <div class="form-group col-md-4">
+            <input type="text" class="form-control" name="city" id="inputCity" placeholder="Cidade">
+        </div>
+        <div class="form-group col-md-4">
+            <input type="text" class="form-control" name="state" id="inputState" placeholder="Estado">
+        </div>
+        <div class="form-group col-md-4">
+            <input type="text" class="form-control" name="zipCode" id="inputZip"  placeholder="CEP">
+        </div>    
+        <div class="form-group col-md-12">
+            <label>Categoria:</label>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-primary">
+                    <input type="radio" name="category" id="option1" autocomplete="off" checked> Roupas
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="category" id="option2" autocomplete="off"> Eletrônicos
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="category" id="option3" autocomplete="off"> Alimentos
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="category" id="option3" autocomplete="off"> Móveis
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="category" id="option3" autocomplete="off"> Brinquedos
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="category" id="option3" autocomplete="off"> Outros
+                </label>
+            </div>
+        </div>
+        <div class="form-group col-md-12">
+            <label>Data de expiração:</label>
+            <div class="input-group">
+                <div class="input-group-addon"><i class="fa fa-calendar-alt" aria-hidden="true"></i></div>
+                <input class="form-control col-md-4" id="adsDuration" name="expirationDate" type="date" placeholder="Fill with the date when it will be discarded">
+            </div>
+        </div>
+        <div class="form-group col-md-12">
+            <input class="form-control" type="file"  id="filetoupload" name="filetoupload" placeholder="Selecione uma foto do produto."/>
+        </div>
+        <div class="form-group col-md-12">
+            <button type="button" class="btn btn-default" ng-click="saveProduct()">Submeter</button>
+        </div>
+    </form>
+</div>

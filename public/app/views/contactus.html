@@ -1,0 +1,73 @@
+<div class="container" ng-controller="ContactController">   
+	<div class="row">
+		<div class="col-xs-12">
+			<nav class="breadcrumb">
+				<a class="breadcrumb-item" href="#">Página Inicial</a>
+				<span class="breadcrumb-item active">Contato</span>
+			</nav>
+		</div>
+		<div class="col-xs-12">
+		   <h3>Informações de Contato</h3>
+		   <hr>
+		</div>
+	</div> 
+    <div class="row row-content">
+	   <div class="col-xs-12">
+		  <h3>Localização</h3> 
+	   </div>
+        <div class="col-xs-12 col-sm-4 col-sm-offset-1">
+                <h5>Endereço</h5>
+                <address style="font-size: 100%">
+                    Rua Antônio Joaquim Mesquita, 1000<br>
+                    Porto Alegre, RS<br>
+                    Brazil<br>
+                    <i class="fa fa-phone"></i>: +5551 9999-9999<br>
+                    <i class="fa fa-fax"></i>: +5551 9999-9999<br>
+                    <i class="fa fa-envelope"></i>: 
+                    <a href="mailto:marlonpgamba@gmail.com ">marlonpgamba@gmail.com</a>
+                </address>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-sm-offset-1">
+            <h5>Find us on Google Maps</h5>
+                <div id="map" style="width:300px;height:300px;background:yellow"></div>
+        </div>
+	</div>
+	<div class="row row-content">
+	   <div class="col-xs-12">
+		  <h3>Envie seu Feedback</h3> 
+	   </div>
+		<div class="col-xs-12 col-sm-9">
+			<form class="form-horizontal" name="feedbackForm" ng-submit="sendFeedback()" novalidate>
+				<div class="form-group" ng-class="{ 'has-error' : feedbackForm.firstname.$error.required && !feedbackForm.firstname.$pristine }">
+					<div class="col-xs-4 col-sm-4 col-md-4">
+						<input type="text" class="form-control" id="firstname" name="firstname" placeholder="Nome completo" ng-model="feedback.firstName" required>
+						<span ng-show="feedbackForm.firstname.$error.required && !feedbackForm.firstname.$pristine" class="help-block">Nome é obrigatório.</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-4 col-sm-4 col-md-4">
+						<input type="tel" class="form-control" id="telnum" name="telnum" placeholder="Número de telefone" ng-model="feedback.tel.number">
+					</div>
+				</div>
+				<div class="form-group"  ng-class="{ 'has-error has-feedback' : feedbackForm.email.$invalid && !feedbackForm.email.$pristine }">
+					<div class="col-sm-8">
+						<input type="email" class="form-control" id="email" name="email" placeholder="Email" ng-model="feedback.email" required>
+						<span ng-show="feedbackForm.email.$invalid && !feedbackForm.email.$pristine" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+						<span ng-show="(feedbackForm.email.$invalid || feedbackForm.email.$error.required) && !feedbackForm.email.$pristine" class="help-block">Digite um email válido.</span>
+					</div>
+				</div>                
+				<div class="form-group">
+					<div class="col-sm-8">
+						<textarea class="form-control" rows="12" ng-model="feedback.comments"> </textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-primary" ng-disabled="feedbackForm.$invalid">Enviar Feedback</button>
+					</div>
+				</div>
+			</form>
+		</div>
+   </div>
+</div>
+

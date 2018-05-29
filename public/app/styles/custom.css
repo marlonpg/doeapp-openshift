@@ -1,0 +1,107 @@
+body {
+    padding-top: 90px;    
+	font-size: 16px;
+	padding-bottom: 50px;
+}
+
+.form-login{
+    max-width: 500px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.img-circle {
+    border-radius: 50%;
+    width: 40px;
+    border: 1px;
+    padding: 4px;
+}
+
+.row-header {
+  margin: 0px auto;
+  padding: 0px 0px;
+}
+
+.row-content {
+  margin: 0px auto;
+  border-bottom: 1px ridge;
+  padding-bottom: 40px;
+  padding-top: 10px;
+}
+
+.row-footer {
+	background-color: orangered;
+	color: white;
+	bottom: 0;
+	text-align: center;
+	width:  100%;
+	position: fixed;
+}
+.img {
+    position: relative;
+    float: left;
+    width:  150px;
+    height: 150px;
+    background-position: 50% 50%;
+    background-repeat:   no-repeat;
+    background-size:     cover;
+}
+.img-product {
+    position: relative;
+    width:  300px;
+    height: 300px;
+    background-position: 30% 30%;
+    background-repeat:   no-repeat;
+    background-size:     cover;
+}
+.result li {
+    margin-top: 15px;
+    background-color: #eceeef;
+}
+
+.result li:hover {
+    margin-top: 15px;
+    background-color:lightgray;
+}
+
+
+.onhover:hover{
+    cursor: pointer;
+    color: orangered;
+}
+
+.search li:hover{
+    background-color: lightgray;
+}
+
+#arrowdown {
+    width: 100px;
+    bottom: 0px;
+    position: absolute;
+    margin-bottom: 30px;
+}
+
+.leftnav {
+    float:left;
+}
+
+.leftnav div button{
+    color: white;
+    background-color: #373a3c;
+}
+
+#btn-doeagora {
+	background-color: orangered;
+	color:white;
+}
+.jumbotronCustom {
+    background-image: url("../images/banner-doe.jpg");
+    background-size: cover;
+    height: 235px;
+}
+.search-input {
+    padding-top: 100px;
+}
+html {
+    overflow-y: scroll;
+}

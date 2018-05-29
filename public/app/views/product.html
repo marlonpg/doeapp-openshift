@@ -1,0 +1,57 @@
+<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<nav class="breadcrumb">
+					<a class="breadcrumb-item" href="#">Página Inicial</a>
+					<span class="breadcrumb-item active">Produtos</span>
+				</nav>
+			</div>
+			<div class="col-xs-12">
+			   <h3>Produto</h3>
+			   <hr>
+			</div>
+		</div>
+		<div ng-controller="ProductController">
+			<div class="row row-content">
+				<div class="col-6 col-xs-9 col-sm-6">
+					<h3 class="media-heading">{{product.name}}</h3>
+					<a><div class="img-product media-object" style="background-image:url(\images{{product.filePath | escape}}"></div></a>
+					<button type="button" class="btn btn-success btn-sm" ng-show="showWish" ng-click="addProductToWishList()">
+						Eu quero! 
+					</button>
+					<button type="button" class="btn btn-danger btn-sm" ng-show="showDelete" ng-click="deleteProduct()">
+						Deletar
+					</button>
+					<button type="button" class="btn btn-warning btn-sm">
+						Interessados <span class="badge">1</span>
+					</button>
+				</div>
+			</div>
+			<div class="row row-content">
+				<div class="col-9 col-xs-9 col-sm-9">
+					<div class="media-body">
+						<h4 class="media-heading">Descrição</h4>
+						<p class="col-9 col-xs-9 col-sm-9 card-text">{{product.description}}</p>
+					</div>
+				</div>
+			</div>
+			<div class="row row-content">
+				<div class="col-6 col-xs-9 col-sm-6">
+					<div class="media-body">
+						<h4 class="media-heading">Localização</h4>
+						<div class="col-9 col-xs-12 col-sm-9">Cidade: {{product.city}}</div>
+						<div class="col-9 col-xs-12 col-sm-9">Estado: {{product.state}}</div>
+						<div class="col-9 col-xs-12 col-sm-9">CEP: {{product.zipCode}}</div>
+					</div>
+				</div>
+				<div class="col-6 col-xs-6 col-sm-6">
+					<div class="media-body">
+						<h4 class="media-heading">Contato</h4>
+						<div class="col-9 col-xs-12 col-sm-9">Nome: {{userContact.userName}}</div>
+						<div class="col-9 col-xs-12 col-sm-9">Telefone: {{userContact.userCellphone}}</div>
+						<div class="col-9 col-xs-12 col-sm-9">Email: {{userContact.userEmail}}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	

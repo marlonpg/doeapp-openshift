@@ -1,0 +1,30 @@
+<div class="container" ng-controller="TimelineController">
+	<div class="jumbotron jumbotronCustom">
+		<div class="col-lg-6 col-xs-12 search-input">
+			<div class="input-group">
+					<input type="text" ng-model="searchProductName" class="form-control" press-enter="search()" placeholder="O que você está procurando?">
+					<span class="input-group-btn">
+						<button class="btn btn-default" ng-click="search()" press-enter="search()" type="button"><span class="fa fa-search"></span></button>
+					</span>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12" ng-if="!showTimeline">
+		<h3>{{message}}</h3>
+	</div>
+	<div >
+		<ul id="timelineResult" class="result" style="list-style-type:none">
+			<li ng-repeat="product in products">
+				<div class="media">
+					<div class="media-left">
+						<a><div class="img media-object" style="background-image:url(\images{{product.filePath | escape}}"></div></a>
+					</div>
+					<div class="media-body">
+						<h4 class="media-heading onhover" ui-sref="app.product({id: product._id})" >{{product.name}}</h4>
+						<span class="card-text"><small class="text-muted">{{product.city}} {{product.state}} - {{product.zipCode}}</small></span>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>

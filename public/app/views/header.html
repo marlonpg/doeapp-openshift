@@ -1,0 +1,26 @@
+<header>
+<nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+	<div class="container" ng-controller="MenuController">
+		<a class="navbar-brand" ui-sref="app">#DOE</a>
+		<ul class="nav navbar-nav">
+			<li class="nav-item">
+				<a class="nav-link onhover" ui-sref="app"><span aria-hidden="true"></span> Página Inicial</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link onhover" ui-sref="app.aboutus"><span aria-hidden="true"></span> Sobre</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link onhover" ui-sref="app.contactus"><span aria-hidden="true"></span> Contato</a>
+			</li>
+		</ul>
+		
+		<button id="btn-doeagora" type="button" ui-sref="app.productregister" class="offset-md-3 btn">#doeAGORA</button>
+
+		<div class="pull-xs-right" id="userLogin">
+			<a ui-sref="app.login">Login</a>
+			<img class="img-circle" src="images/photoTemplate.png">
+			<a >{{name}}</a>
+		</div>
+	</div>
+</nav>
+</header>

@@ -1,0 +1,42 @@
+<div class="container" ng-controller="SearchController">
+	<div class="row">
+		<div class="col-xs-12">
+			<nav class="breadcrumb">
+				<a class="breadcrumb-item" href="#">Página Inicial</a>
+				<span class="breadcrumb-item active">Search</span>
+			</nav>
+		</div>
+		<div class="col-xs-12">
+			<h3>Página de busca</h3>
+			<hr>
+		</div>
+	</div>
+	<div class="jumbotron" style="height:120px">
+		<div class="col-lg-6 col-xs-12">
+			<div class="input-group">
+				<input type="text" ng-model="searchProductName" class="form-control" press-enter="search()" placeholder="O que você está procurando?">
+				<span class="input-group-btn">
+					<button class="btn btn-default" ng-click="search()" press-enter="search()" type="button"><span class="fa fa-search"></span></button>
+				</span>
+			</div>
+		</div>
+		<div ng-show="productName" class="col-lg-6 col-xs-12">
+			<p>Última pesquisa realizada: "{{productName}}"</p>
+		</div>
+	</div>
+	<div>
+		<ul id="searchResult" class="result" style="list-style-type:none">
+			<li ng-repeat="product in products">
+				<div class="media">
+					<div class="media-left">
+						<a><div class="img media-object" style="background-image:url(\images{{product.filePath | escape}}"></div></a>
+					</div>
+					<div class="media-body">
+						<h4 class="media-heading onhover" ui-sref="app.product({id: product._id})" >{{product.name}}</h4>
+						<span class="card-text"><small class="text-muted">{{product.city}} {{product.state}} - {{product.zipCode}}</small></span>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>

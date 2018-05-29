@@ -1,0 +1,20 @@
+<div class="container" ng-controller="LoginController">
+    <form class="form-login" name="loginForm" novalidate>
+		<div class="col-xs-12" ng-class="messageClass" ng-if="showLoading">
+			<h3>{{message}}</h3>
+		</div>
+        <h2>Login</h2>
+		<!-- email -->
+		<div class="form-group"  ng-class="{ 'has-danger' : loginForm.email.$invalid && !loginForm.email.$pristine }">
+			<input type="email" class="form-control" id="email" name="email" placeholder="Email" ng-model="user.email" required>
+			<span ng-show="(loginForm.email.$invalid || loginForm.email.$error.required) && !loginForm.email.$pristine" class="form-text">Enter a valid email address.</span>
+		</div>
+		<!-- password -->
+        <div class="form-group" ng-class="{ 'has-danger' : loginForm.password.$invalid && !loginForm.password.$pristine }">
+            <input type="password" name="password" class="form-control" ng-model="user.password" placeholder="Senha" required>
+			<p ng-show="(loginForm.password.$invalid || loginForm.password.$error.required) && !loginForm.email.$pristine" class="form-text">Enter your password.</p>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="button" ng-click="login()" ng-disabled="loginForm.$invalid">Entrar</button>
+        <span>Não tem cadastro? Cadastre-se </span> <a class="form-login-link" ui-sref="app.signup">aqui!</a>
+    </form>
+</div>

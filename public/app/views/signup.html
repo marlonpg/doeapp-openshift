@@ -1,0 +1,31 @@
+<div class="container" ng-controller="SignupController">
+	<form class="form-login" name="signupForm" novalidate>
+        <h2>Cadastre-se</h2>
+		<div class="col-xs-12" ng-class="messageClass" ng-if="showLoading">
+			<h3>{{message}}</h3>
+		</div>
+		<!-- username -->
+		<div class="form-group"  ng-class="{ 'has-danger' : signupForm.name.$invalid && !signupForm.name.$pristine }">
+			<input type="text" class="form-control" id="name" name="name" placeholder="Seu nome" ng-model="user.name" required autofocus>
+			<span ng-show="(signupForm.name.$invalid || signupForm.name.$error.required) && !signupForm.name.$pristine" class="form-text">Enter a valid name.</span>
+		</div>
+		<!-- cellphone -->
+		<div class="form-group"  ng-class="{ 'has-danger' : signupForm.cellphone.$invalid && !signupForm.cellphone.$pristine }">
+			<input type="text" class="form-control" id="cellphone" name="cellphone" placeholder="Seu telefone" ng-model="user.cellphone" required autofocus>
+			<span ng-show="(signupForm.name.$invalid || signupForm.cellphone.$error.required) && !signupForm.cellphone.$pristine" class="form-text">Enter a valid cellphone.</span>
+		</div>
+		<!-- email -->
+		<div class="form-group"  ng-class="{ 'has-danger' : signupForm.email.$invalid && !signupForm.email.$pristine }">
+			<input type="email" class="form-control" id="email" name="email" placeholder="Seu e-mail" ng-model="user.email" required>
+			<span ng-show="(signupForm.email.$invalid || signupForm.email.$error.required) && !signupForm.email.$pristine" class="form-text">Enter a valid email address.</span>
+		</div>
+		<!-- password -->
+        <div class="form-group" ng-class="{ 'has-danger' : signupForm.password.$invalid && !signupForm.password.$pristine }">
+            <input type="password" name="password" class="form-control" ng-model="user.password" ng-minlength="3" ng-maxlength="8" placeholder="Sua senha" required>
+			<p ng-show="(signupForm.password.$error.minlength || signupForm.password.$error.maxlength)" class="form-text">Password must have between 3 and 8 characters.</p>
+            <p ng-show="(signupForm.password.$invalid || signupForm.password.$error.required) && !signupForm.password.$pristine && !(signupForm.password.$error.minlength || signupForm.password.$error.maxlength)" class="form-text">Enter your password.</p>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="button" ng-click="signup()" ng-disabled="signupForm.$invalid">Cadastrar</button>
+        <span>Já possui uma conta? </span> <a ui-sref="app.login">Login</a>
+    </form>	
+</div>
