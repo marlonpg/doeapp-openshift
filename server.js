@@ -33,11 +33,10 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
     // Provide UI label that excludes user id and pw
     mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
     mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
-
   }
 }
-console.log("IP: "+ip);
-if(ip == '0.0.0.0'){
+
+if(!mongoURL){
 	mongoose.connect(config.database);
 } else {
 	mongoose.connect(mongoURL);
