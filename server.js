@@ -36,7 +36,13 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
 
   }
 }
-mongoose.connect(mongoURL);
+console.log("IP: "+ip);
+if(ip == '0.0.0.0'){
+	mongoose.connect(config.database);
+} else {
+	mongoose.connect(mongoURL);
+}
+
 app.set('secret', config.secret);
 
 //ACCESS POST body information and URL parameters
@@ -80,11 +86,6 @@ app.get("/logout", function(req, res) {
   console.log("Logout");
   res.send("You have been logged out of the system!");
 });
-
-app.get('/pagecount', function (req, res) {
-//openshift test
-	res.send('{ pageCount: 0}');
-  });
 
 ///////////////////
 //API ROUTES
@@ -418,6 +419,14 @@ app.use('/api', routes);
 
 //STATIC CONTENT
 app.use("/", express.static("public/"));
+
+
+app.get("/healthcheck", function(req, res) {
+	console.log("healthcheck");
+	res.status(200).send({ 
+		message: "Ok"
+	});
+  });
 
 app.listen(port, ip);
 console.log("App listening at http://%s:%s", ip, port);
