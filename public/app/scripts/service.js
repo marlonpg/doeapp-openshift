@@ -2,7 +2,7 @@
 function createNewProduct(token) {
     console.log('createNewProduct');
     return $.ajax({
-        url:'/api/product',
+        url:'http://localhost:8080/api/product',
         method: 'POST',
 		beforeSend: function(request) {
 			request.setRequestHeader("x-access-token", token);

@@ -3,7 +3,7 @@
 angular.module('doeApp', ['ui.router', 'ngResource'])
 	.config([ '$httpProvider',   function($httpProvider) {
 		$httpProvider.interceptors.push('resourceInterceptor');
-    }])/*
+    }])
     .config(['$httpProvider', function($httpProvider) {
         if (!$httpProvider.defaults.headers.get) {
             $httpProvider.defaults.headers.get = {};    
@@ -14,7 +14,6 @@ angular.module('doeApp', ['ui.router', 'ngResource'])
         $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
         $httpProvider.defaults.headers.get['Pragma'] = 'no-cache';
     }])
-    */
     .config(function ($stateProvider, $urlRouterProvider) {
         $stateProvider
             .state('app', {
@@ -68,8 +67,8 @@ angular.module('doeApp', ['ui.router', 'ngResource'])
                     }
                 }
             })
-			.state('app.timeline', {
-                url: 'timeline',
+			.state('app.home', {
+                url: 'home',
                 views: {
                     'content@': {
                         templateUrl : 'views/timeline.html',

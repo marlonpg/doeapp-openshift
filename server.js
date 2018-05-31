@@ -8,7 +8,7 @@ var jwt    = require('jsonwebtoken');
 var config = require('./config');
 var User   = require('./models/user');
 var Product   = require('./models/product');
-var DesiredProduct   = require('./models/desiredproduct');
+var WishList   = require('./models/wishlist');
 
 ///////////////////
 //CONFIGURATION
@@ -36,7 +36,7 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
   }
 }
 
-if(!mongoURL){
+if (typeof mongoURL === "undefined") {
 	mongoose.connect(config.database);
 } else {
 	mongoose.connect(mongoURL);
@@ -92,35 +92,37 @@ var routes = express.Router();
 
 routes.post('/wishlist/:id', function(req, res) {
 	console.log("addProductToWishList "+ req.params.id);
-	DesiredProduct.count({productid: req.params.id},function(err, counter) {
+	WishList.count({productid: req.params.id},function(err, counter) {
 		if (err){
+			console.log(err);
 			return res.status(500).send(err);
 		}
 		if(counter >= 2){
-			return res.json({ success: false, message: 'Not available! There are '+ counter+' users interested.' });
+			return res.json({ success: false, message: 'Não está disponível no momento! Há '+ counter+' usuários interessados.' });
 		} else {
 			getUserFromSession(req).then(
 				function(userSession) {
 					console.log(userSession);
-					var desiredProduct = new DesiredProduct({ 
+					var wishList = new WishList({ 
 						productid: req.params.id,
 						useremail: userSession.userEmail
 					});
 
-					DesiredProduct.count({productid: req.params.id, useremail: userSession.userEmail}, function(err, counter) {
+					WishList.count({productid: req.params.id, useremail: userSession.userEmail}, function(err, counter) {
 						if (err){
+							console.log(err);
 							return res.status(500).send(err);
 						}
 						if(counter > 0){
 							console.log(counter);
-							return res.json({ success: false, message: 'You have already added this product.' });
+							return res.json({ success: false, message: 'Você já possui este produto.' });
 						} else {
-							desiredProduct.save(function(err){
+							wishList.save(function(err){
 								if(err){
 									console.log(err);
-									res.json({ success: false, message: 'Invalid information!' });
+									return res.status(500).send(err);
 								} else {
-									res.json({ message: 'Your product has been added successfully!' });
+									res.json({ success: true, message: 'Você está na fila de interessados em obter este produto!' });
 								}
 							});
 						}
@@ -128,21 +130,77 @@ routes.post('/wishlist/:id', function(req, res) {
 				},
 				function(err) {
 					console.log(err);
-					sendAllowedResponse(res, err);
+					return res.status(500).send(err);
 				}
 			);
 		}
 	});
 });
 
-routes.get('/wishlist/:id', function(req, res) {
-	console.log("getProductWishList "+ req.params.id);
-	DesiredProduct.count({productid: req.params.id},function(err, counter) {
-		if (err){
+routes.delete('/wishlist/:id', function(req, res) {
+	console.log("removeProductFromWishList "+ req.params.id);
+	getUserFromSession(req).then(
+		function(userSession) {
+			WishList.remove({productid: req.params.id, useremail: userSession.userEmail}, function(err, message) {
+				if (err){
+					console.log(err);
+					return res.status(500).send(err);
+				} else {
+					console.log("removeProductFromWishList "+message);
+					res.json({ success: true, message: 'Você NÃO está mais fila de interessados em obter este produto!' });
+				}
+			});
+		},
+		function(err) {
+			console.log(err);
 			return res.status(500).send(err);
 		}
-			return res.json({ success: true, counter: counter, userlist: [], message: 'Not available! There are ' + counter + ' users interested.' });
-	});
+	);
+});
+
+routes.get('/wishlist/:id', function(req, res) {
+	var productId = req.params.id;
+	console.log("getProductWishList "+ productId);
+	getUserFromSession(req).then(
+		function(userSession) {
+			getProduct(productId).then(
+				function(response){
+					var user = JSON.parse(JSON.stringify(response[0]));
+					WishList.find({productid: productId},function(err, userList) {
+						if (err){
+							console.log(err);
+							return res.status(500).send(err);
+						}
+						console.log(userList);
+						if(userSession.isAdmin || user.userEmail == userSession.userEmail){
+							var userArray = []
+							for(var i = 0; i < userList.length; i++) {
+								userArray.push(userList[i].useremail);
+							}
+							return res.json({ success: true, size: userList.length, users: userArray});
+						} else {
+							var userproduct = userList.find( function(user) { 
+								return user.useremail === userSession.userEmail;
+							} );
+							if(userproduct){
+								return res.json({ success: true, size: userList.length, users: [userproduct.useremail]});
+							} else{
+								return res.json({ success: true, size: userList.length, users: []});
+							}
+						}
+					});					
+				},
+				function(err) {
+					console.log(err);
+					return res.status(500).send(err);
+				}
+			);
+		},
+		function(err) {
+			console.log(err);
+			return res.status(500).send(err);
+		}
+	);
 });
 
 routes.get("/product/:id", function(req, res){
@@ -194,10 +252,10 @@ routes.post('/authenticate', function(req, res) {
 		if (err) throw err;
 	
 		if (!user) {
-			res.json({ success: false, message: 'Invalid credentials!' });
+			res.json({ success: false, message: 'Senha ou Email inválidos!' });
 		} else if (user) {
 			if (user.password != req.body.password) {
-				res.json({ success: false, message: 'Wrong credentials!' });
+				res.json({ success: false, message: 'Senha ou Email inválidos!' });
 			} else {
 				const payload = {
 					userEmail: user.email,
@@ -239,9 +297,9 @@ routes.post('/signup', function(req, res) {
 	newUser.save(function(err){
 		if(err){
 			console.log(err);
-			res.json({ success: false, message: 'Invalid information!' });
+			res.json({ success: false, message: 'Informação inválida!' });
 		} else {
-			res.json({ message: 'Your account has been created successfully!' });
+			res.json({ message: 'Sua conta foi criada com sucesso!' });
 		}
 	});
 });
@@ -284,8 +342,8 @@ function getUserFromSession(request) {
 	})
 }
 
-function hasPermission(productId, userEmail) {
-	console.log("hasPermission: "+ productId + ' '+userEmail);
+function getProduct(productId) {
+	console.log("getProduct: "+ productId);
 	return new Promise(function(resolve, reject) {
 		var ObjectId = require('mongoose').Types.ObjectId; 
 		var query = { "_id" : new ObjectId(productId)};
@@ -295,11 +353,6 @@ function hasPermission(productId, userEmail) {
 				resolve('false');
 			}
 			resolve(product);
-			/*if(product.userEmail === userEmail){
-				resolve(true);
-			} else {
-				resolve(false);
-			}*/
 		});
 	})
 }
@@ -363,7 +416,7 @@ routes.delete("/product/:id", function(req, res) {
 	console.log("deleteProduct "+ productId);
 	getUserFromSession(req).then(
 		function(userSession) {
-			hasPermission(productId, userSession.userEmail).then(
+			getProduct(productId).then(
 				function(response){
 					var user = JSON.parse(JSON.stringify(response[0]));
 					if(userSession.isAdmin || user.userEmail == userSession.userEmail){
@@ -373,7 +426,7 @@ routes.delete("/product/:id", function(req, res) {
 								console.log(err);
 								return;
 							}
-							res.json({ success: true, message: 'Product has been deleted successfully!' });
+							res.json({ success: true, message: 'Produto foi deletado com sucesso!' });
 						});
 					} else {
 						return res.status(403).send({ 
@@ -385,7 +438,7 @@ routes.delete("/product/:id", function(req, res) {
 					
 				},
 				function(err) {
-					console.log("ERROR hasPermissions ",err);
+					console.log("ERROR getProduct ",err);
 					return;
 				}
 			);
@@ -419,13 +472,13 @@ app.use('/api', routes);
 //STATIC CONTENT
 app.use("/", express.static("public/"));
 
-
+//HEALTH CHECK
 app.get("/healthcheck", function(req, res) {
 	console.log("healthcheck");
 	res.status(200).send({ 
 		message: "Ok"
 	});
-  });
+});
 
 app.listen(port, ip);
 console.log("App listening at http://%s:%s", ip, port);

@@ -4,3 +4,8 @@ C:\Program Files\MongoDB\Server\3.6\bin\
 mongod.exe --dbpath C:\Users\Marlon\Documents\develop\mongodb\data
 
 http://localhost:8080/app/index.html#/
+
+cores legais
+#0B2028 escura
+#F4F1EA quase branca 
+https://color.adobe.com/pt/Jean-Valjean-color-theme-7449871/edit/?copy=true&base=2&rule=Custom&selected=1&name=C%C3%B3pia%20de%20Jean%20Valjean&mode=rgb&rgbvalues=0.0431373,0.12549,0.156863,0.454902,0.137255,0.133333,0.780392,0.337255,0.0235294,1,0.27058823529411763,0,0.956863,0.945098,0.917647&swatchOrder=0,1,2,3,4
