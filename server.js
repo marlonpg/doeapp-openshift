@@ -80,15 +80,332 @@ app.get("/products", function(req, res) {
 	});
 });
 
-//TODO
-app.get("/logout", function(req, res) {
-  console.log("Logout");
-  res.send("You have been logged out of the system!");
-});
-
 ///////////////////
 //API ROUTES
 var routes = express.Router(); 
+
+routes.get('/wishlist/:id', function(req, res) {
+	var productId = req.params.id;
+	console.log('getProductWishList '+productId);
+	getUsersWishByProduct(productId).then(
+		function(userList){
+			getUserFromSession(req).then(
+				function(userSession){
+					getProduct(productId).then(
+						function(response){
+							var user = JSON.parse(JSON.stringify(response[0]));
+							if(userSession.isAdmin || user.userEmail == userSession.userEmail){
+								var userArray = []
+								for(var i = 0; i < userList.length; i++) {
+									userArray.push(userList[i].useremail);
+								}
+								return res.json({ size: userList.length, users: userArray});
+							} else {
+								var userproduct = userList.find( function(user) { 
+									return user.useremail === userSession.userEmail;
+								} );
+								if(userproduct){
+									return res.json({ size: userList.length, users: [userproduct.useremail]});
+								} else{
+									return res.json({ size: userList.length, users: []});
+								}
+							}
+						},
+						function(error){
+							return res.json({ size: userList.length, users: []});
+						}
+					);
+				},
+				function(error){
+					return res.json({ size: userList.length, users: []});
+				}
+			);
+		},
+		function(error){
+			console.log(err);
+			return res.status(500).send(err);
+		}
+	);
+});
+
+routes.get("/product/:id", function(req, res){
+	console.log("getProduct: "+ req.params.id);
+	var ObjectId = require('mongoose').Types.ObjectId; 
+	var query = { "_id" : new ObjectId(req.params.id)};
+
+	Product.find(query, function (err, product) {
+		if (err){
+			return res.status(500).send(err);
+		}
+		return res.status(200).send(product);	
+	});
+});
+
+routes.get("/products", function(req, res){
+	console.log("searchProducts: "+ req.query.name);
+	var ObjectId = require('mongoose').Types.ObjectId; 
+	var query = {"name" :{  $regex: new RegExp(req.query.name, "i") }};
+	console.log("searchProducts: query:"+ JSON.stringify(query));
+	Product.find(query, function (err, products) {
+		if (err){
+			return res.status(500).send(err);
+		}
+		return res.status(200).send(products);	
+	});
+});
+
+//AUTHENTICATE USER
+routes.post('/authenticate', function(req, res) {
+	User.findOne({email: req.body.email}, function(err, user) {
+		if (err) throw err;
+	
+		if (!user) {
+			res.json({ success: false, message: 'Senha ou Email inválidos!' });
+		} else if (user) {
+			if (user.password != req.body.password) {
+				res.json({ success: false, message: 'Senha ou Email inválidos!' });
+			} else {
+				const payload = {
+					userEmail: user.email,
+					isAdmin: user.admin 
+				};
+				var token = jwt.sign(payload, app.get('secret'), {
+					expiresInMinutes: 20
+				});
+				res.json({
+					success: true,
+					email:req.body.email,
+					name:user.name,
+					isAdmin:user.admin,
+					cellphone:user.cellphone,
+					message: 'authenticated!',
+					token: token
+				});
+			}   
+		}
+	});
+});
+
+//USER REGISTER
+routes.post('/signup', function(req, res) {
+	var name = req.body.name;
+	var cellphone = req.body.cellphone;
+	var email = req.body.email;
+	var password = req.body.password;
+	
+	console.log("Creating new User - NAME: %s - CELLPHONE: %s - EMAIL: %s - PASSWORD: %s", name, cellphone, email, password);
+	var newUser = new User({ 
+		name: name,
+		cellphone: cellphone,
+		email: email, 
+		password: password,
+		admin: false 
+	});
+
+	newUser.save(function(err){
+		if(err){
+			console.log(err);
+			res.status(500).send({ message: 'Internal Error!' });
+		} else {
+			res.json({ message: 'Sua conta foi criada com sucesso!' });
+		}
+	});
+});
+
+//ROUTE MIDDLEWARE - All below will have restricted access
+routes.use(function(req, res, next) {
+	var token = req.body.token || req.query.token || req.headers['x-access-token'];
+	if (token) {
+		jwt.verify(token, app.get('secret'), function(err, decoded) {      
+			if (err) {
+				return res.status(400).send({
+					loggedIn: false,
+					message: 'Acesso não autorizado ou sessão expirada!'
+				});
+			} else {
+				req.decoded = decoded;    
+				next();
+			}
+		});
+	} else {
+		return res.status(403).send({ 
+			success: false, 
+			loggedIn: false,
+			message: 'Acesso não autorizado ou sessão expirada!' 
+		});
+	}
+});
+
+function getUserFromSession(request) {
+	var token = request.body.token || request.query.token || request.headers['x-access-token'];
+	return new Promise(function(resolve, reject) {
+		if (token) {
+			jwt.verify(token, app.get('secret'), function(err, decoded) {      
+				if (err) {
+					console.log("getUserFromSession - Failed to authenticate token."); 
+					reject(err);
+				} else {
+					var user = JSON.parse(JSON.stringify(decoded));
+					resolve({'userEmail' :user.userEmail, 'isAdmin': user.isAdmin});
+				}
+			});
+		} else {
+			reject(err);
+		}
+	})
+}
+
+function getProduct(productId) {
+	console.log("getProduct: "+ productId);
+	return new Promise(function(resolve, reject) {
+		var ObjectId = require('mongoose').Types.ObjectId; 
+		var query = { "_id" : new ObjectId(productId)};
+	
+		Product.find(query, function (err, product) {
+			if (err){
+				console.log("getProduct - Failed to get product from mongodb.");
+				reject(err);
+			}
+			resolve(product);
+		});
+	})
+}
+
+function getUsersWishByProduct(productId) {
+	console.log("getUsersWishByProduct: "+ productId);
+	return new Promise(function(resolve, reject) {
+		var ObjectId = require('mongoose').Types.ObjectId; 
+		var query = { "_id" : new ObjectId(productId)};
+		WishList.find({productid: productId},function(err, userList) {
+			if (err){
+				console.log("getUsersWishByProduct - Failed to get product from mongodb.");
+				reject(err);
+			}
+			resolve(userList);
+		});
+	})
+}
+
+function hasPermissionsToSeeContactInfo(req, userEmail){
+	return new Promise(function(resolve, reject) {
+		getUsersWishByProduct(req.params.id).then(
+			function(userList){
+				getUserFromSession(req).then(
+					function(userSession){
+						if(userSession.isAdmin || userEmail == userSession.userEmail){
+							resolve(true);
+						}
+						var userproduct = userList.find( function(user) { 
+							return user.useremail === userSession.userEmail;
+						} );
+						if(userproduct){
+							resolve(true);
+						} else {
+							resolve(false);
+						}
+					},
+					function(error){
+						resolve(false);
+					}
+				);
+			},
+			function(error){
+				resolve(false);
+			}
+		);
+	})
+}
+
+//createProduct
+routes.post("/product", function(req, res) {
+	console.log("addProduct: "+ req.body.productName);
+	var name = req.body.productName;
+	var description = req.body.productDescription;
+	var category = req.body.category;
+	var expirationDate = req.body.expirationDate;
+	var fileName;
+	var filePath;
+	var fileUIPath;
+
+	if (!req.files.filetoupload) {
+		console.log("No files were uploaded.");
+	}
+	else {
+		var timestamp = (new Date()).getTime();
+		
+		fileName = timestamp +req.files.filetoupload.name;
+	
+		console.log('Uploading file ' + fileName + '...');
+
+		let filetoupload = req.files.filetoupload;
+
+		fileUIPath = "/uploads/" + fileName;
+		filePath = "public/app/images/uploads/" + fileName;
+		filetoupload.mv(filePath, function(err) {
+			if (err) return res.status(500).send(err);
+		});
+	}
+
+	var newProduct = new Product({ 
+		userEmail: 	req.decoded.userEmail,
+		name: name,
+		description: description,
+		city: req.body.city,
+		state: req.body.state,
+		zipCode: req.body.zipCode,
+		category: category,
+		expirationDate: expirationDate,
+		filePath: fileUIPath 
+	});
+
+	newProduct.save(function(err){
+		if(err){
+			console.log(err);
+			return;
+		}
+
+		res.json({ product: newProduct });
+	});
+});
+
+//deleteProduct
+routes.delete("/product/:id", function(req, res) {
+	var productId = req.params.id;
+	console.log("deleteProduct "+ productId);
+	getUserFromSession(req).then(
+		function(userSession) {
+			getProduct(productId).then(
+				function(response){
+					var user = JSON.parse(JSON.stringify(response[0]));
+					if(userSession.isAdmin || user.userEmail == userSession.userEmail){
+						console.log("Response -getProduct "+ user);
+						Product.remove({ _id: productId }, function(err) {
+							if(err){
+								console.log(err);
+								return;
+							}
+							res.json({ success: true, message: 'Produto foi deletado com sucesso!' });
+						});
+					} else {
+						return res.status(403).send({ 
+							success: false,
+							message: 'Not Authorized!' 
+						});
+					}
+					
+				},
+				function(err) {
+					console.log("ERROR getProduct ",err);
+					return;
+				}
+			);
+		},
+		function(err) {
+			console.log(err);
+			return;
+		}
+	);
+});
 
 routes.post('/wishlist/:id', function(req, res) {
 	console.log("addProductToWishList "+ req.params.id);
@@ -158,64 +475,6 @@ routes.delete('/wishlist/:id', function(req, res) {
 	);
 });
 
-routes.get('/wishlist/:id', function(req, res) {
-	var productId = req.params.id;
-	console.log("getProductWishList "+ productId);
-	getUserFromSession(req).then(
-		function(userSession) {
-			getProduct(productId).then(
-				function(response){
-					var user = JSON.parse(JSON.stringify(response[0]));
-					WishList.find({productid: productId},function(err, userList) {
-						if (err){
-							console.log(err);
-							return res.status(500).send(err);
-						}
-						console.log(userList);
-						if(userSession.isAdmin || user.userEmail == userSession.userEmail){
-							var userArray = []
-							for(var i = 0; i < userList.length; i++) {
-								userArray.push(userList[i].useremail);
-							}
-							return res.json({ success: true, size: userList.length, users: userArray});
-						} else {
-							var userproduct = userList.find( function(user) { 
-								return user.useremail === userSession.userEmail;
-							} );
-							if(userproduct){
-								return res.json({ success: true, size: userList.length, users: [userproduct.useremail]});
-							} else{
-								return res.json({ success: true, size: userList.length, users: []});
-							}
-						}
-					});					
-				},
-				function(err) {
-					console.log(err);
-					return res.status(500).send(err);
-				}
-			);
-		},
-		function(err) {
-			console.log(err);
-			return res.status(500).send(err);
-		}
-	);
-});
-
-routes.get("/product/:id", function(req, res){
-	console.log("getProduct: "+ req.params.id);
-	var ObjectId = require('mongoose').Types.ObjectId; 
-	var query = { "_id" : new ObjectId(req.params.id)};
-
-	Product.find(query, function (err, product) {
-		if (err){
-			return res.status(500).send(err);
-		}
-		return res.status(200).send(product);	
-	});
-});
-
 routes.get("/user-from-product/:id", function(req, res){
 	console.log("getUserFromProduct: "+ req.params.id);
 	var ObjectId = require('mongoose').Types.ObjectId; 
@@ -225,246 +484,30 @@ routes.get("/user-from-product/:id", function(req, res){
 		if (err){
 			return res.status(500).send(err);
 		}
-		User.findOne({email: product.userEmail}, function(err, user) {
-			if (user) {
-				return res.status(200).send({userEmail:product.userEmail, userName: user.name, userCellphone: user.cellphone });
-			}
-		});
-	});
-});
-
-routes.get("/products", function(req, res){
-	console.log("searchProducts: "+ req.query.name);
-	var ObjectId = require('mongoose').Types.ObjectId; 
-	var query = {"name" :{  $regex: new RegExp(req.query.name, "i") }};
-	console.log("searchProducts: query:"+ JSON.stringify(query));
-	Product.find(query, function (err, products) {
-		if (err){
-			return res.status(500).send(err);
-		}
-		return res.status(200).send(products);	
-	});
-});
-
-//AUTHENTICATE USER
-routes.post('/authenticate', function(req, res) {
-	User.findOne({email: req.body.email}, function(err, user) {
-		if (err) throw err;
-	
-		if (!user) {
-			res.json({ success: false, message: 'Senha ou Email inválidos!' });
-		} else if (user) {
-			if (user.password != req.body.password) {
-				res.json({ success: false, message: 'Senha ou Email inválidos!' });
-			} else {
-				const payload = {
-					userEmail: user.email,
-					isAdmin: user.admin 
-				};
-				var token = jwt.sign(payload, app.get('secret'), {
-					expiresInMinutes: 20
-				});
-				res.json({
-					success: true,
-					email:req.body.email,
-					name:user.name,
-					isAdmin:user.admin,
-					cellphone:user.cellphone,
-					message: 'authenticated!',
-					token: token
-				});
-			}   
-		}
-	});
-});
-
-//USER REGISTER
-routes.post('/signup', function(req, res) {
-	var name = req.body.name;
-	var cellphone = req.body.cellphone;
-	var email = req.body.email;
-	var password = req.body.password;
-	
-	console.log("Creating new User - NAME: %s - CELLPHONE: %s - EMAIL: %s - PASSWORD: %s", name, cellphone, email, password);
-	var newUser = new User({ 
-		name: name,
-		cellphone: cellphone,
-		email: email, 
-		password: password,
-		admin: false 
-	});
-
-	newUser.save(function(err){
-		if(err){
-			console.log(err);
-			res.json({ success: false, message: 'Informação inválida!' });
-		} else {
-			res.json({ message: 'Sua conta foi criada com sucesso!' });
-		}
-	});
-});
-
-//ROUTE MIDDLEWARE - All below will have restricted access
-routes.use(function(req, res, next) {
-	var token = req.body.token || req.query.token || req.headers['x-access-token'];
-	if (token) {
-		jwt.verify(token, app.get('secret'), function(err, decoded) {      
-			if (err) {
-				return res.json({ success: false, message: 'Failed to authenticate token.' });    
-			} else {
-				req.decoded = decoded;    
-				next();
-			}
-		});
-	} else {
-		return res.status(403).send({ 
-			success: false, 
-			loggedIn: false,
-			message: 'Not Authorized!' 
-		});
-	}
-});
-
-function getUserFromSession(request) {
-	var token = request.body.token || request.query.token || request.headers['x-access-token'];
-	return new Promise(function(resolve, reject) {
-		if (token) {
-			jwt.verify(token, app.get('secret'), function(err, decoded) {      
-				if (err) {
-					console.log("getUserFromSession - Failed to authenticate token."); 
-					reject(err);
-				} else {
-					var user = JSON.parse(JSON.stringify(decoded));
-					resolve({'userEmail' :user.userEmail, 'isAdmin': user.isAdmin});
-				}
-			});
-		}
-	})
-}
-
-function getProduct(productId) {
-	console.log("getProduct: "+ productId);
-	return new Promise(function(resolve, reject) {
-		var ObjectId = require('mongoose').Types.ObjectId; 
-		var query = { "_id" : new ObjectId(productId)};
-	
-		Product.find(query, function (err, product) {
-			if (err){
-				resolve('false');
-			}
-			resolve(product);
-		});
-	})
-}
-
-//createProduct
-routes.post("/product", function(req, res) {
-	//console.log(req);
-	var name = req.body.productName;
-	var description = req.body.productDescription;
-	var category = req.body.category;
-	var expirationDate = req.body.expirationDate;
-	var fileName;
-	var filePath;
-	var fileUIPath;
-	console.log("Got a POST request to create a new product");
-
-	if (!req.files.filetoupload) {
-		console.log("No files were uploaded.");
-	}
-	else {
-		var timestamp = (new Date()).getTime();
-		
-		fileName = timestamp +req.files.filetoupload.name;
-	
-		console.log('Uploading file ' + fileName + '...');
-
-		let filetoupload = req.files.filetoupload;
-
-		fileUIPath = "/uploads/" + fileName;
-		filePath = "public/app/images/uploads/" + fileName;
-		filetoupload.mv(filePath, function(err) {
-			if (err) return res.status(500).send(err);
-		});
-	}
-
-	var newProduct = new Product({ 
-		userEmail: 	req.decoded.userEmail,
-		name: name,
-		description: description,
-		city: req.body.city,
-		state: req.body.state,
-		zipCode: req.body.zipCode,
-		category: category,
-		expirationDate: expirationDate,
-		filePath: fileUIPath 
-	});
-
-	newProduct.save(function(err){
-		if(err){
-			console.log(err);
-			return;
-		}
-
-		res.json({ product: newProduct });
-	});
-});
-
-//deleteProduct
-routes.delete("/product/:id", function(req, res) {
-	var productId = req.params.id;
-	console.log("deleteProduct "+ productId);
-	getUserFromSession(req).then(
-		function(userSession) {
-			getProduct(productId).then(
-				function(response){
-					var user = JSON.parse(JSON.stringify(response[0]));
-					if(userSession.isAdmin || user.userEmail == userSession.userEmail){
-						console.log("Response -getProduct "+ user);
-						Product.remove({ _id: productId }, function(err) {
-							if(err){
-								console.log(err);
-								return;
-							}
-							res.json({ success: true, message: 'Produto foi deletado com sucesso!' });
-						});
-					} else {
-						return res.status(403).send({ 
-							success: false, 
-							loggedIn: false,
-							message: 'Not Authorized!' 
-						});
+		hasPermissionsToSeeContactInfo(req, product.userEmail).then(
+			function(response){
+				User.findOne({email: product.userEmail}, function(err, user) {
+					if (err){
+						console.log(err);
+						return res.status(500).send(err);
 					}
-					
-				},
-				function(err) {
-					console.log("ERROR getProduct ",err);
-					return;
-				}
-			);
-		},
-		function(err) {
-			console.log(err);
-			return;
-		}
-	);
-});
-
-
-//ALL REGISTERED USERS
-routes.get('/users', function(req, res) {
-  User.find({}, function(err, users) {
-    res.json(users);
-  });
-});   
-
-function sendAllowedResponse(res, message){
-	console.log("Error message: "+ message);
-	res.status(200).send({ 
-		success: false, 
-		message: message 
+					if (user) {
+						if(response){
+							return res.status(200).send({userEmail:product.userEmail, userName: user.name, userCellphone: user.cellphone });
+						} else {
+							return res.status(200).send({userEmail:'XXXXXX@XXXXXX.XXX', userName: user.name, userCellphone: '(XX) XXXXX-XXXX' });
+						}
+					} 
+					return res.status(200).send({userEmail:'XXXXXX@XXXXXX.XXX', userName: 'XXXXXX', userCellphone: '(XX) XXXXX-XXXX' });
+				});
+			}, 
+			function(error){
+				console.log(err);
+				return res.status(500).send(err);
+			}
+		);
 	});
-}
+});
 
 //APPLYING ROUTES
 app.use('/api', routes);

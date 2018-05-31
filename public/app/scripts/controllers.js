@@ -53,19 +53,11 @@ angular.module('doeApp')
 				wishListService.get({'productId':$stateParams.id})
 				.$promise.then(
 					function(response) {
-						console.log(response);
-						if(response.success){
-							$scope.wishListNumber = response.size;
-							console.log(response.users);
-							console.log(UserService.email);
-							console.log(response.users.includes(UserService.email));
-							$scope.isDesiring = response.users.includes(UserService.email);
-						} else {
-							$scope.wishListNumber = 0;
-						}
+						$scope.wishListNumber = response.size;
+						$scope.isDesiring = response.users.includes(UserService.email);
 					},
 					function(response) {
-						console.log("Error getProductWishList: "+response.status + " " + response.statusText);
+						//console.log("Error getProductWishList: "+response.status + " " + response.statusText);
 						$scope.message = "Error: "+response.status + " " + response.statusText;
 					}
 				);
@@ -79,6 +71,7 @@ angular.module('doeApp')
 						function(response) {
 							if(response.success){
 								$scope.getProductWishList();
+								$scope.getUserFromProduct();
 								alert(response.message);
 							} else {
 								alert(response.message);
@@ -100,6 +93,7 @@ angular.module('doeApp')
 						function(response) {
 							if(response.success){
 								$scope.getProductWishList();
+								$scope.getUserFromProduct();
 								alert(response.message);
 							} else {
 								alert(response.message);
@@ -110,6 +104,24 @@ angular.module('doeApp')
 							$scope.message = "Error: "+response.status + " " + response.statusText;
 						}
 					);
+				}
+			}
+
+			$scope.getUserFromProduct = function(){
+				if((UserService.isAdmin === true || UserService.isAdmin === 'true')  || (UserService.email)){
+					productService.getUserFromProduct($stateParams.id).get()
+						.$promise.then(
+							function(response) {
+								$scope.userContact = response;
+								changeButtonsVisibility();
+							},
+							function(response) {
+								$scope.userContact =  {userEmail:'XXXXXX@XXXXX.XXX', userName: 'XXXXXX', userCellphone: '(XX) XXXXX-XXXX' }
+								console.log("Error: "+response.status + " " + response.statusText);
+							}
+					);
+				} else {
+					$scope.userContact =  {userEmail:'XXXXXX@XXXXX.XXXXXX', userName: 'XXXXXX', userCellphone: '(XX) XXXXX-XXXX' }
 				}
 			}
 
@@ -135,18 +147,8 @@ angular.module('doeApp')
 						$scope.message = "Error: "+response.status + " " + response.statusText;
 					}
 			);
-			
-			productService.getUserFromProduct($stateParams.id).get()
-				.$promise.then(
-					function(response) {
-						$scope.userContact = response;
-						changeButtonsVisibility();
-					},
-					function(response) {
-						$scope.message = "Error: "+response.status + " " + response.statusText;
-					}
-			);
 
+			$scope.getUserFromProduct();
 			$scope.getProductWishList();
         }])
 		.controller('LoginController', ['$rootScope', '$scope', 'loginService', 'UserService', 'LocalStorage', function($rootScope, $scope, loginService, UserService, LocalStorage) {
@@ -207,7 +209,7 @@ angular.module('doeApp')
 				})
 				.fail(function(xhr) {
 					if(!xhr.responseJSON.loggedIn){
-						var response = confirm("You must be logged to do this operation!");
+						var response = confirm("Você precisa estar logado para realizar esta operação!");
 						if (response == true) {
 							$scope.$state.go("app.login");
 						}
