@@ -23,8 +23,8 @@ angular.module('doeApp', ['ui.router', 'ngResource'])
                         templateUrl : 'views/header.html'
                     },
                     'content': {
-                        templateUrl : 'views/timeline.html',
-                        controller  : 'TimelineController'
+                        templateUrl : 'views/home.html',
+                        controller  : 'HomeController'
                     },
                     'footer': {
                         templateUrl : 'views/footer.html'
@@ -71,8 +71,8 @@ angular.module('doeApp', ['ui.router', 'ngResource'])
                 url: 'home',
                 views: {
                     'content@': {
-                        templateUrl : 'views/timeline.html',
-                        controller  : 'TimelineController'
+                        templateUrl : 'views/home.html',
+                        controller  : 'HomeController'
                     }
                 }
             }).state('app.productregister', {

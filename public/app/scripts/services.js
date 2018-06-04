@@ -10,15 +10,6 @@ angular.module('doeApp')
 		  email : ''
 	  };
 	})
-	
-	.factory('timelineFactory', ['$resource', 'baseURL', function($resource, baseURL) {
-		var timelineFactory = {};
-
-		timelineFactory.getTimelineProducts = function() {
-			return $resource(baseURL + "products");
-		};
-		return timelineFactory;
-	}])
 
 	.service('loginService', ['$resource', 'baseURL', function($resource, baseURL) {
 		this.login = function() {
@@ -52,20 +43,23 @@ angular.module('doeApp')
 	}])
 
 	.service('productService', ['$resource', 'baseURL', function($resource, baseURL) {
-		this.getProduct = function(productId) {
-			return $resource(baseURL + "api/product/"+productId);
-		};
+			return $resource(baseURL + "api/product/:productId", {productId: '@id'}, {
+				update: {method: 'PUT'}
+			});
+	}])
+
+	//REVIEW
+	.service('tempService', ['$resource', 'baseURL', function($resource, baseURL) {
 		this.getUserFromProduct = function(productId) {
 			console.log("getUserFromProduct");
 			return $resource(baseURL + "api/user-from-product/"+productId);
 		};
-		this.deleteProduct = function(productId) {
-			return $resource(baseURL + "api/product/"+productId);
-		};
-		this.searchProducts = function(name) {
-			return $resource(baseURL + "api/products?name="+name);
+		//Refactor service to be included into productService
+		this.searchProducts = function(name, status, limit, sort) {
+			return $resource(baseURL + "api/products?name="+name+'&status='+status+'&limit='+limit+'&sort='+sort);
 		};
 	}])
+
 	.service('wishListService', ['$resource', 'baseURL', function($resource, baseURL) {
 		return $resource(baseURL + "api/wishlist/:productId", {productId: '@id'});
 	}])

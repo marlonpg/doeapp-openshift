@@ -9,31 +9,43 @@ angular.module('doeApp')
 		.filter('escape', function() {
 			return window.encodeURIComponent;
 		})
-		.controller('TimelineController', ['$scope', 'timelineFactory', function($scope, timelineFactory) {
-            $scope.showTimeline = false;
+		.controller('HomeController', ['$scope', 'tempService', function($scope, tempService) {
             $scope.message = "Loading ...";			
-            $scope.products = timelineFactory.getTimelineProducts().query()
-                .$promise.then(
-                    function(response) {
-                        $scope.products = response;
-                        $scope.showTimeline = true;
-                    },
-                    function(response) {
-                        $scope.message = "Error: "+response.status + " " + response.statusText;
-                    }
+            tempService.searchProducts('','available', 3, 'desc').query().$promise.then(
+				function(response) {
+					$scope.recentAddedProducts = response;
+				},
+				function(response) {
+					$scope.message = "Error: "+response.status + " " + response.statusText;
+				}
+			);
+			tempService.searchProducts('','donated', 3, 'desc').query().$promise.then(
+				function(response) {
+					$scope.donatedProducts = response;
+				},
+				function(response) {
+					$scope.message = "Error: "+response.status + " " + response.statusText;
+				}
 			);
 			$scope.search = function () {
 				$scope.$state.go("app.search", {productName: $scope.searchProductName});
 			}
+			$scope.formatDate = function (createdDate){
+				if(createdDate){
+					var date = new Date(createdDate);
+					return date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear()+' - '+date.getHours()+'h '+date.getMinutes()+'m'
+				}
+				return;
+			}
         }])
-		.controller('ProductController', ['$scope', 'productService', '$stateParams', 'UserService', 'wishListService', function($scope, productService, $stateParams, UserService, wishListService) {
+		.controller('ProductController', ['$scope', 'productService', '$stateParams', 'UserService', 'wishListService', 'tempService', function($scope, productService, $stateParams, UserService, wishListService, tempService) {
 			$scope.showWish = false;
 			$scope.showDelete = false;
-
+			$scope.usersWishList = '';
 			$scope.deleteProduct = function(){
 				var deleteProduct = window.confirm('Você quer mesmo deletar o Produto "'+ $scope.product.name + '"?');
 				if(deleteProduct){
-					productService.deleteProduct($stateParams.id).remove()
+					productService.remove({'productId':$stateParams.id},{})
 						.$promise.then(
 							function(response) {
 								console.log(response);
@@ -48,6 +60,27 @@ angular.module('doeApp')
 				}
 			};
 			
+			$scope.updateProduct = function() {
+				console.log("CALLING updateProduct");
+				$scope.product.status = 'donated';
+				var wasProductDonated = window.confirm('O produto "'+ $scope.product.name + '" foi doado?');
+				if(wasProductDonated){
+					productService.update({'productId':$stateParams.id}, $scope.product)
+					.$promise.then(
+						function(response) {
+							$scope.getProductWishList();
+							$scope.getUserFromProduct();
+							console.log(response);
+						},
+						function(response) {
+							alert("Você não tem permissão para mudar o status deste produto.");
+							console.log("Error deleteProduct: "+response.status + " " + response.statusText);
+							$scope.message = "Error: "+response.status + " " + response.statusText;
+						}
+					);
+				}
+			}
+
 			$scope.getProductWishList = function() {
 				console.log("CALLING getProductWishList");
 				wishListService.get({'productId':$stateParams.id})
@@ -55,6 +88,16 @@ angular.module('doeApp')
 					function(response) {
 						$scope.wishListNumber = response.size;
 						$scope.isDesiring = response.users.includes(UserService.email);
+						if(response.users.length > 1){
+							$scope.usersWishList = response.users[0] + ' e ' +response.users[1];
+						} else if(response.users.length == 1){
+							$scope.usersWishList = response.users[0];
+						} else {
+							$scope.usersWishList = '';
+						}
+						$(function () {
+							$('[data-toggle="tooltip2"]').tooltip();
+						})
 					},
 					function(response) {
 						//console.log("Error getProductWishList: "+response.status + " " + response.statusText);
@@ -109,7 +152,7 @@ angular.module('doeApp')
 
 			$scope.getUserFromProduct = function(){
 				if((UserService.isAdmin === true || UserService.isAdmin === 'true')  || (UserService.email)){
-					productService.getUserFromProduct($stateParams.id).get()
+					tempService.getUserFromProduct($stateParams.id).get()
 						.$promise.then(
 							function(response) {
 								$scope.userContact = response;
@@ -126,19 +169,25 @@ angular.module('doeApp')
 			}
 
 			var changeButtonsVisibility = function(){
-				if((UserService.isAdmin === true || UserService.isAdmin === 'true')  || (UserService.email === $scope.userContact.userEmail)){
+				if($scope.product.status ==='donated') {
 					$scope.showWish = false;
-					$scope.showDelete = true;
-				} else if((UserService.isAdmin === false || UserService.isAdmin === 'false') && (UserService.email !== $scope.userContact.userEmail)){
-					$scope.showWish = true;
 					$scope.showDelete = false;
+					$scope.usersWishList = '';
 				} else {
-					$scope.showWish = false;
-					$scope.showDelete = false;
+					if((UserService.isAdmin === true || UserService.isAdmin === 'true')  || (UserService.email === $scope.userContact.userEmail)){
+						$scope.showWish = false;
+						$scope.showDelete = true;
+					} else if((UserService.isAdmin === false || UserService.isAdmin === 'false') && (UserService.email !== $scope.userContact.userEmail)){
+						$scope.showWish = true;
+						$scope.showDelete = false;
+					} else {
+						$scope.showWish = false;
+						$scope.showDelete = false;
+					}
 				}
 			}
 						
-			productService.getProduct($stateParams.id).query()
+			productService.query({'productId':$stateParams.id})
 				.$promise.then(
 					function(response) {
 						$scope.product = response[0];
@@ -150,6 +199,9 @@ angular.module('doeApp')
 
 			$scope.getUserFromProduct();
 			$scope.getProductWishList();
+			$(function () {
+				$('[data-toggle="tooltip"]').tooltip()
+			})
         }])
 		.controller('LoginController', ['$rootScope', '$scope', 'loginService', 'UserService', 'LocalStorage', function($rootScope, $scope, loginService, UserService, LocalStorage) {
             $scope.showLoading = false;
@@ -164,7 +216,6 @@ angular.module('doeApp')
 							$scope.loginForm.$setPristine();
 							$scope.showLoading = false;
 							LocalStorage.setLocalStorage(response.token, response.name, response.email, response.isAdmin);
-							
 							$scope.$state.go("app.home");
 						} else {
 							LocalStorage.cleanLocalStorage();
@@ -191,6 +242,8 @@ angular.module('doeApp')
 						$scope.signupForm.$setPristine();
 						$scope.messageClass = "alert alert-success alert-dismissable";
 						$scope.message = response.message;
+						alert(response.message);
+						$scope.$state.go("app.login");
                     },
                     function(response) {
                         $scope.message = "Error: "+response.status + " " + response.statusText;
@@ -230,7 +283,7 @@ angular.module('doeApp')
 				$scope.$state.go("app");
 			}
 		}])
-		.controller('SearchController', ['$scope', 'productService','$stateParams', function($scope, productService, $stateParams) {		
+		.controller('SearchController', ['$scope', 'tempService','$stateParams', function($scope, tempService, $stateParams) {		
 			$scope.productName;
 			$scope.showLastSearch;
 			$scope.search = function () {
@@ -239,12 +292,10 @@ angular.module('doeApp')
 				} else {
 					$scope.productName = $scope.searchProductName;
 				}
-				
-				productService.searchProducts($scope.productName).query()
+				tempService.searchProducts($scope.productName, '','','').query()
                 .$promise.then(
                     function(response) {
                         $scope.products = response;
-						$scope.showTimeline = true;
 						$scope.searchProductName = '';
                     },
                     function(response) {
@@ -263,10 +314,8 @@ angular.module('doeApp')
 						scope.$apply(function (){
 							scope.$eval(attrs.pressEnter);
 						});
-		
 						event.preventDefault();
 					}
 				});
 			};
 		});
-;

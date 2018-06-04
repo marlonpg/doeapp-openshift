@@ -11,5 +11,7 @@ module.exports = mongoose.model('Product', new Schema({
 	zipCode: String,
 	category: String,
 	expirationDate: String,
-	filePath: String
+	filePath: String,
+	status: { type: String, default: 'available' },
+	createdDate: { type: Date, default: Date.now }
 }));

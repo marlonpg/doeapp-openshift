@@ -1,5 +1,5 @@
 <header>
-<nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+<nav class="navbar-fixed-top navbar-dark bg-inverse nav-custom">
 	<div class="container" ng-controller="MenuController">
 		<a class="navbar-brand" ui-sref="app.home">#DOE</a>
 		<ul class="nav navbar-nav">
@@ -10,7 +10,7 @@
 				<a class="nav-link onhover" ui-sref="app.contactus"><span aria-hidden="true"></span> Contato</a>
 			</li>
 		</ul>
-		<button id="btn-doeagora" type="button" ui-sref="app.productregister" class="offset-md-3 btn">#doeAGORA</button>
+		<button type="button" ui-sref="app.productregister" class="btn-doeagora offset-md-3 btn"><strong>#DOE</strong></button>
 
 		<div class="nav navbar-nav pull-xs-right" id="userLogin">
 			<a ui-sref="app.login" ng-show="!name">Login</a>
