@@ -1,18 +1,18 @@
 <div class="container" ng-controller="SearchController">
 	<div class="row">
-		<div class="col-xs-12">
+		<div class="col-12">
 			<nav class="breadcrumb">
 				<a class="breadcrumb-item" ui-sref="app.home">Página Inicial</a>
 				<span class="breadcrumb-item active">Search</span>
 			</nav>
 		</div>
-		<div class="col-xs-12">
+		<div class="col-12">
 			<h3>Página de busca</h3>
 			<hr>
 		</div>
 	</div>
 	<div class="jumbotron" style="height:120px">
-		<div class="col-lg-6 col-xs-12">
+		<div class="col-lg-6 col-12">
 			<div class="input-group">
 				<input type="text" ng-model="searchProductName" class="form-control" press-enter="search()" placeholder="O que você está procurando?">
 				<span class="input-group-btn">
@@ -20,7 +20,7 @@
 				</span>
 			</div>
 		</div>
-		<div ng-show="productName" class="col-lg-6 col-xs-12">
+		<div ng-show="productName" class="col-lg-6 col-12">
 			<p>Última pesquisa realizada: "{{productName}}"</p>
 		</div>
 	</div>

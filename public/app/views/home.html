@@ -1,6 +1,6 @@
 <div class="container" ng-controller="HomeController">
 	<div class="jumbotron jumbotronCustom">
-		<div class="col-lg-6 col-xs-12 search-input">
+		<div class="col-lg-6 col-12 search-input">
 			<div class="input-group">
 					<input type="text" ng-model="searchProductName" class="form-control" press-enter="search()" placeholder="O que você está procurando?">
 					<span class="input-group-btn">
@@ -11,12 +11,12 @@
 	</div>
 <div class="tablegrid">
 	<div class="row">
-		<h3 class="subtitles">
+		<h3 class="col-12 subtitles">
 			<small class="text-muted">Últimos itens adicionados</small>
 		</h3>
-		<div class="col-xl-12">
+		<div class="col-12">
 			<div class="row" class="result" >
-				<div class="griditem col-lg-4 col-md-6 col-sm-12 col-xs-12" ng-repeat="product in recentAddedProducts" ui-sref="app.product({id: product._id})">
+				<div class="griditem col-lg-4 col-md-6 col-sm-12 col-12" ng-repeat="product in recentAddedProducts" ui-sref="app.product({id: product._id})">
 					<div class="media">
 						<div class="media-left">
 							<a><div class="img media-object" style="background-image:url(\images{{product.filePath | escape}})"></div></a>
@@ -25,20 +25,21 @@
 							<h4 class="media-heading onhover" ui-sref="app.product({id: product._id})" >{{product.name}}</h4>
 							<span class="card-text"><small class="text-muted">{{product.city}} {{product.state}} - {{product.zipCode}}</small></span>
 						</div>
-						<span>{{formatDate(product.createdDate)}}</span>
+						
 					</div>
+					<span class="media">{{formatDate(product.createdDate)}}</span>
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<div class="row">
-		<h3 class="subtitles">
+		<h3 class="col-12 subtitles">
 			<small class="text-muted">Doados recentemente</small>
 		</h3>
 		<div class="col-xl-12">
 			<div class="row" class="result" >
-				<div class="griditem col-lg-4 col-md-6 col-sm-12 col-xs-12" ng-repeat="product in donatedProducts" ui-sref="app.product({id: product._id})">
+				<div class="griditem col-lg-4 col-md-6 col-sm-12 col-12" ng-repeat="product in donatedProducts" ui-sref="app.product({id: product._id})">
 					<div class="media">
 						<div class="media-left">
 							<a><div class="img media-object" style="background-image:url(\images{{product.filePath | escape}})"></div></a>

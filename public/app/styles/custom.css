@@ -3,7 +3,7 @@ body {
 	font-size: 14px;
 	padding-bottom: 50px;
 }
-nav {
+.nav-custom {
     padding: .25rem 1rem;
 }
 .form-login{
@@ -59,7 +59,9 @@ nav {
 .media {
     opacity: 0.7;
 }
-
+.media-left{
+    padding-right: 10px;
+}
 .img-product {
     position: relative;
     width:  300px;
@@ -88,6 +90,7 @@ nav {
 .result li {
     margin-top: 15px;
     background-color: #eceeef;
+    margin-left: -30px;
 }
 
 .result li:hover {
@@ -95,6 +98,9 @@ nav {
     background-color:lightgray;
 }
 
+.closeNavBar{
+    
+}
 
 .onhover:hover{
     cursor: pointer;

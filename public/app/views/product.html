@@ -1,19 +1,19 @@
 <div class="container">
 		<div class="row">
-			<div class="col-xs-12">
+			<div class="col-12">
 				<nav class="breadcrumb">
 					<a class="breadcrumb-item" ui-sref="app.home">Página Inicial</a>
 					<span class="breadcrumb-item active">Produtos</span>
 				</nav>
 			</div>
-			<div class="col-xs-12">
+			<div class="col-12">
 			   <h3>Produto</h3>
 			   <hr>
 			</div>
 		</div>
 		<div class="textwrap" ng-controller="ProductController">
 			<div class="row row-content">
-				<div class="col-6 col-xs-12 col-sm-8">
+				<div class="col-12 col-sm-8">
 					<h4 class="media-heading">
 						{{product.name}} 
 						<button type="button" class="btn btn-sm btn-donated" ng-show="showDelete" ng-click="updateProduct()">
@@ -41,28 +41,28 @@
 				</div>
 			</div>
 			<div class="row row-content">
-				<div class="col-9 col-xs-9 col-sm-9">
+				<div class="col-12 col-sm-9">
 					<div class="media-body">
 						<h5 class="media-heading">Descrição</h5>
-						<p class="col-9 col-xs-9 col-sm-9 card-text">{{product.description}}</p>
+						<p class="col-9 col-sm-9 card-text">{{product.description}}</p>
 					</div>
 				</div>
 			</div>
 			<div class="row row-content">
-				<div class="col-6 col-xs-9 col-sm-6">
+				<div class="col-12 col-sm-6">
 					<div class="media-body">
 						<h5 class="media-heading">Localização</h5>
-						<div class="col-9 col-xs-12 col-sm-9">Cidade: {{product.city}}</div>
-						<div class="col-9 col-xs-12 col-sm-9">Estado: {{product.state}}</div>
-						<div class="col-9 col-xs-12 col-sm-9">CEP: {{product.zipCode}}</div>
+						<div class="col-12 col-sm-9">Cidade: {{product.city}}</div>
+						<div class="col-12 col-sm-9">Estado: {{product.state}}</div>
+						<div class="col-12 col-sm-9">CEP: {{product.zipCode}}</div>
 					</div>
 				</div>
-				<div class="col-6 col-xs-6 col-sm-6">
+				<div class="col-12 col-sm-6">
 					<div class="media-body" data-toggle="tooltip" data-placement="top" title="Visível somente para interessados.">
 						<h5 class="media-heading">Contato</h5>
-						<div class="col-9 col-xs-12 col-sm-9">Nome: {{userContact.userName}}</div>
-						<div class="col-9 col-xs-12 col-sm-9">Telefone: {{userContact.userCellphone}}</div>
-						<div class="col-9 col-xs-12 col-sm-9">Email: {{userContact.userEmail}}</div>
+						<div class="col-12 col-sm-9">Nome: {{userContact.userName}}</div>
+						<div class="col-12 col-sm-9">Telefone: {{userContact.userCellphone}}</div>
+						<div class="col-12 col-sm-9">Email: {{userContact.userEmail}}</div>
 					</div>
 				</div>
 			</div>

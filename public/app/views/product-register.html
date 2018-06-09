@@ -1,39 +1,39 @@
 <div class="container" ng-controller="ProductRegisterController"> 
 	<div class="row">
-		<div class="col-xs-12">
+		<div class="col-12">
 			<nav class="breadcrumb">
 				<a class="breadcrumb-item" ui-sref="app.home">Página Inicial</a>
 				<span class="breadcrumb-item active">Cadastro de produtos</span>
 			</nav>
 		</div>
-		<div class="col-xs-12">
+		<div class="col-12">
 		   <h3>Cadastre um novo produto para doação.</h3>
 		   <hr>
 		</div>
 	</div> 
-    <form class="col-md-9" id='prodregister'action = "/product" method = "POST" enctype = "multipart/form-data">
+    <form class="col-md-9" id='prodregister' name='prodregister' action = "/product" method = "POST" enctype = "multipart/form-data">
         <div class="form-group col-md-12">
         <h2>Informações do Produto</h2>
         </div>
         <div class="form-group col-md-12">
-            <input type="text" class="form-control" name="productName" id="productName" placeholder="Nome do produto">
+            <input type="text" class="form-control" name="productName" id="productName"  placeholder="Nome do produto" required>
         </div>
         <div class="form-group col-md-12">
-            <textarea class="form-control" rows="4" cols="50" name="productDescription" id="productDescription" placeholder="Descrição do produto" form="prodregister"></textarea>
+            <textarea class="form-control" rows="4" cols="50" name="productDescription" id="productDescription" placeholder="Descrição do produto" form="prodregister" required></textarea>
         </div>
 
         <div class="form-group col-md-4">
-            <input type="text" class="form-control" name="city" id="inputCity" placeholder="Cidade">
+            <input type="text" class="form-control" name="city" id="inputCity" placeholder="Cidade" required>
         </div>
         <div class="form-group col-md-4">
-            <input type="text" class="form-control" name="state" id="inputState" placeholder="Estado">
+            <input type="text" class="form-control" name="state" id="inputState" placeholder="Estado" required>
         </div>
         <div class="form-group col-md-4">
-            <input type="text" class="form-control" name="zipCode" id="inputZip"  placeholder="CEP">
+            <input type="text" class="form-control" name="zipCode" id="inputZip"  placeholder="CEP" required>
         </div>    
         <div class="form-group col-md-12">
             <label>Categoria:</label>
-            <div class="btn-group" data-toggle="buttons">
+            <div class="" data-toggle="buttons">
                 <label class="btn btn-primary">
                     <input type="radio" name="category" id="option1" autocomplete="off" checked> Roupas
                 </label>
@@ -65,7 +65,7 @@
             <input class="form-control" type="file"  id="filetoupload" name="filetoupload" placeholder="Selecione uma foto do produto."/>
         </div>
         <div class="form-group col-md-12">
-            <button type="button" class="btn btn-default" ng-click="saveProduct()">Submeter</button>
+            <button type="button" class="btn btn-default" ng-click="saveProduct()" ng-disabled="prodregister.$invalid">Submeter</button>
         </div>
     </form>
 </div>

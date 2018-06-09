@@ -37,6 +37,9 @@ angular.module('doeApp')
 				}
 				return;
 			}
+			$('.closeNavBar').on('click', function(){
+				$('.navbar-collapse').collapse('hide');
+			});
         }])
 		.controller('ProductController', ['$scope', 'productService', '$stateParams', 'UserService', 'wishListService', 'tempService', function($scope, productService, $stateParams, UserService, wishListService, tempService) {
 			$scope.showWish = false;

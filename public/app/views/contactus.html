@@ -1,21 +1,21 @@
 <div class="container" ng-controller="ContactController">   
 	<div class="row">
-		<div class="col-xs-12">
+		<div class="col-12">
 			<nav class="breadcrumb">
 				<a class="breadcrumb-item" ui-sref="app.home">Página Inicial</a>
 				<span class="breadcrumb-item active">Contato</span>
 			</nav>
 		</div>
-		<div class="col-xs-12">
+		<div class="col-12">
 		   <h3>Informações de Contato</h3>
 		   <hr>
 		</div>
 	</div> 
     <div class="row row-content">
-	   <div class="col-xs-12">
+	   <div class="col-12">
 		  <h3>Localização</h3> 
 	   </div>
-        <div class="col-xs-12 col-sm-4 col-sm-offset-1">
+        <div class="col-12 col-sm-4 col-sm-offset-1">
                 <h5>Endereço</h5>
                 <address style="font-size: 100%">
                     Rua Antônio Joaquim Mesquita, 1000<br>
@@ -27,25 +27,25 @@
                     <a href="mailto:gambasoftware@gmail.com">gambasoftware@gmail.com</a>
                 </address>
         </div>
-        <div class="col-xs-12 col-sm-6 col-sm-offset-1">
+        <div class="col-12 col-sm-6 col-sm-offset-1">
             <h5>Find us on Google Maps</h5>
-                <div id="map" style="width:300px;height:300px;background:yellow"></div>
+                <div id="map" style="width:200px;height:200px;background:yellow"></div>
         </div>
 	</div>
 	<div class="row row-content">
-	   <div class="col-xs-12">
+	   <div class="col-12">
 		  <h3>Envie seu Feedback</h3> 
 	   </div>
-		<div class="col-xs-12 col-sm-9">
+		<div class="col-12 col-sm-9">
 			<form class="form-horizontal" name="feedbackForm" ng-submit="sendFeedback()" novalidate>
 				<div class="form-group" ng-class="{ 'has-error' : feedbackForm.firstname.$error.required && !feedbackForm.firstname.$pristine }">
-					<div class="col-xs-4 col-sm-4 col-md-4">
+					<div class="col-12 col-sm-4 col-md-4">
 						<input type="text" class="form-control" id="firstname" name="firstname" placeholder="Nome completo" ng-model="feedback.firstName" required>
 						<span ng-show="feedbackForm.firstname.$error.required && !feedbackForm.firstname.$pristine" class="help-block">Nome é obrigatório.</span>
 					</div>
 				</div>
 				<div class="form-group">
-					<div class="col-xs-4 col-sm-4 col-md-4">
+					<div class="col-12 col-sm-4 col-md-4">
 						<input type="tel" class="form-control" id="telnum" name="telnum" placeholder="Número de telefone" ng-model="feedback.tel.number">
 					</div>
 				</div>
