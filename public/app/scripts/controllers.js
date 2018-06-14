@@ -299,7 +299,7 @@ angular.module('doeApp')
 				} else {
 					$scope.productName = $scope.searchProductName;
 				}
-				tempService.searchProducts($scope.productName, '','','').query()
+				tempService.searchProducts($scope.productName, '','',$scope.sort).query()
                 .$promise.then(
                     function(response) {
                         $scope.products = response;
@@ -311,8 +311,11 @@ angular.module('doeApp')
 				);
 			}
 			if($stateParams.productName){
-				$scope.search();
+				$scope.sort = '';
+			} else {
+				$scope.sort = 'desc';
 			}
+			$scope.search();
 		}])
 		.directive('pressEnter', function () {
 			return function (scope, element, attrs) {
