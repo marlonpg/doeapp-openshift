@@ -193,15 +193,15 @@ angular.module('doeApp')
 			productService.query({'productId':$stateParams.id})
 				.$promise.then(
 					function(response) {
-						$scope.product = response[0];
+						$scope.product = response[0];	
+						$scope.getUserFromProduct();
+						$scope.getProductWishList();
 					},
 					function(response) {
 						$scope.message = "Error: "+response.status + " " + response.statusText;
 					}
 			);
 
-			$scope.getUserFromProduct();
-			$scope.getProductWishList();
 			$(function () {
 				$('[data-toggle="tooltip"]').tooltip()
 			})
